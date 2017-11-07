@@ -16,13 +16,35 @@ class Arc:
         return "{0} -> {1}".format(self.origin, self.destination)
 
     def __repr__(self):
-        return "{0} -> {1}".format(self.origin, self.destination)
+        return "{0} -({2})-> {1}".format(self.origin, self.destination, self.weight)
 
     def __eq__(self, other):
         return self.origin == other.origin and self.destination == other.destination
 
     def __hash__(self):
         return hash(repr(self))
+
+
+def paths_with_predicate(paths, predicate):
+    """
+    Half the problems presented will rely on the ability to filter paths by a predicate
+    :param paths:
+    :param predicate:
+    :return:
+    """
+    return list(filter((lambda path: predicate(path)), paths))
+
+
+def path_cost(path):
+    """
+    just what it says
+    :param path:
+    :return:
+    """
+    cost = 0
+    for arc in path:
+        cost = cost + arc.weight
+    return cost
 
 
 def find_all_paths(from_node, to_node, in_graph):
@@ -80,15 +102,15 @@ if __name__ == "__main__":
     ]
     # let's call this a test suite..
     paths1 = find_all_paths("X", "Z", triangles)
-    print("Paths1:", paths1)
     assert find_all_paths("X", "Z", triangles) == [[Arc("X", "V", 4), Arc("V", "Z", 3)],
                                                    [Arc("X", "Z", 9)],
-                                                   [Arc("X", "Y", 2), Arc("Y","V", 5), Arc("V", "Z", 3)]]
+                                                   [Arc("X", "Y", 2), Arc("Y", "V", 5), Arc("V", "Z", 3)]]
 
     paths_to_self = find_all_paths("X", "X", triangles)
     assert paths_to_self == [[Arc("X", "V", 4), Arc("V", "Z", 3), Arc("Z", "X", 11)],
                              [Arc("X", "Z", 9), Arc("Z", "X", 11)],
-                             [Arc("X", "Z", 9), Arc("Z", "Y", 6), Arc("Y", "V", 5), Arc("V","Z",3), Arc("Z","X", 11)],
+                             [Arc("X", "Z", 9), Arc("Z", "Y", 6), Arc("Y", "V", 5), Arc("V", "Z", 3),
+                              Arc("Z", "X", 11)],
                              [Arc("X", "Y", 2), Arc("Y", "V", 5), Arc("V", "Z", 3), Arc("Z", "X", 11)]]
 
     # graph in the original problem
@@ -115,26 +137,12 @@ if __name__ == "__main__":
         Arc("C", "A", 15)  # new edge from C back to A
     ]
 
-    paths = find_all_paths("C", "C", my_graph)
-    for path in paths:
-        print("Path: {}".format(path))
+    paths_c_c = find_all_paths("C", "C", my_graph)
+    for path in paths_c_c:
+        print("Path: {0}, cost: {1}".format(path, path_cost(path)))
 
-    def paths_with_predicate(paths, predicate):
-        """
-        Half the problems presented will rely on the ability to filter paths by a predicate
-        :param paths:
-        :param predicate:
-        :return:
-        """
-        return list(filter(lambda path: predicate(path), paths))
+    print('#' * 20)
 
-    def compute_path_cost(path):
-        """
-        just what it says
-        :param path:
-        :return:
-        """
-        cost = 0
-        for arc in path:
-            cost = cost + path[2]
-        return cost
+    cheap_paths = paths_with_predicate(paths_c_c, lambda p: path_cost(p) > 26)
+    for path in cheap_paths:
+        print("Path: {0}, cost: {1}".format(path, path_cost(path)))
