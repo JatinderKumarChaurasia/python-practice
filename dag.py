@@ -1,31 +1,6 @@
 from collections import deque
 from copy import deepcopy
 
-def recurse(n):
-    print("before, N= ", n)
-    if n == 0:
-        pass
-    else:
-        recurse(n-1)
-    print("after, N=", n)
-
-
-def recurse2(n, l):
-    print("before, N={0}, L={1}".format(n, l))
-    if n != 0:
-        l.append(n)
-        recurse2(n-1, l)
-    print("after, N={0}, L={1}".format(n, l))
-
-
-def recurse3(n, q):
-    print("before, N={0}, Q={1}".format(n, q))
-    if n != 0:
-        q.append(n)
-        recurse3(n-1, q)
-        q.pop()
-    print("after, N={0}, Q={1}".format(n, q))
-
 
 def find_all_paths(from_node, to_node, in_graph):
     all_paths = deque()
@@ -81,9 +56,3 @@ if __name__ == "__main__":
     paths = find_all_paths("A", "C", graph)
     for path in paths:
         print("Path: {}".format(path))
-
-    # print("BFS traversal:")
-    # bdfs(nA, [], deque(), print_node, True)
-    #
-    # print("DFS traversal:")
-    # bdfs(nA, [], deque(), print_node, False)
