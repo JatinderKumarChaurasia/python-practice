@@ -4,7 +4,7 @@ from copy import deepcopy
 
 class Arc:
     """
-    Represents a graph node, with a value and list on neighbours
+    Represents an edge(arc) of a directed graph node
     """
 
     def __init__(self, origin, destination, weight):
@@ -36,25 +36,29 @@ def find_all_paths(from_node, to_node, in_graph):
     all_paths = []
 
     def take(step, paths_queue):
+        # each step carries a history of all of its preceding steps, and a set of nodes visited on those
         curr_arc, history, visited = step
         visited.add(curr_arc)
 
-        # we took a step - it may lead us to victory! so need to write it down
+        # we took a step - write it down in history
         history.append(curr_arc)
 
-        if curr_arc.destination == to_node:
+        if curr_arc.destination == to_node:  # we've reached it - this path is done
             all_paths.append(history)
             return
 
         new_edges = [(arc, deepcopy(history), visited) for arc in in_graph if
-                     (arc.origin == curr_arc.destination and (arc not in visited or arc.destination == to_node))]
+                     (arc.origin == curr_arc.destination and (arc not in visited
+                                                              or arc.destination == to_node))]
+        # I feel bad about the line above: we're not considering edges that lead to nodes that are already
+        # visited, _except_ if it happens to be our destination node. Makes me feel I've missed some elegance =)
         paths_queue.extend(new_edges)
 
         return
 
     # get all the edges that start at the "from" node
     starting_paths = [(arc, [], set(arc.origin)) for arc in in_graph if arc.origin == from_node]
-    paths_queue = deque()
+    paths_queue = deque()  # a queue of active paths, representing a possible journey to the destination
     paths_queue.extend(starting_paths)
     # ...and dive in
     while len(paths_queue) != 0:
