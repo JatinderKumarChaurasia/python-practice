@@ -2,6 +2,16 @@ from collections import deque
 from copy import deepcopy
 
 
+class Arc:
+    """
+    Represents a graph node, with a value and list on neighbours
+    """
+
+    def __init__(self, origin, destination, weight):
+        self.origin = origin
+        self.destination = destination
+        self.weight = weight
+
 def find_all_paths(from_node, to_node, in_graph):
     """
     Find all the paths from from_node to to_node in in_graph
@@ -23,13 +33,14 @@ def find_all_paths(from_node, to_node, in_graph):
             all_paths.append(history)
             return
 
-        new_edges = [(e[0], e[1], e[2], deepcopy(history), visited) for e in in_graph if e[0] == dst and e[1] not in visited]
+        new_edges = [(e[0], e[1], e[2], deepcopy(history), visited) for e in in_graph if
+                     (e[0] == dst and (e[1] not in visited or e[1] == to_node))]
         paths_queue.extend(new_edges)
 
         return
 
     # from our graph, which is a list of edges, get all the edges that start at the "from" node
-    starting_paths = [(f, t, w, [], set()) for (f, t, w) in in_graph if f == from_node]
+    starting_paths = [(f, t, w, [], set(f)) for (f, t, w) in in_graph if f == from_node]
     paths_queue = deque()
     paths_queue.extend(starting_paths)
     # ...and dive in
@@ -46,12 +57,19 @@ if __name__ == "__main__":
         ("X", "Z", 9),
         ("X", "V", 4),
         ("Y", "V", 5),
-        ("V", "Z", 3)
+        ("V", "Z", 3),
+        ("Z", "Y", 6),
+        ("Z", "X", 11)
     ]
     # let's call this a test suite..
     assert find_all_paths("X", "Z", triangles) == deque([[("X", "V", 4), ("V", "Z", 3)],
                                                   [("X", "Z", 9)],
                                                   [("X", "Y", 2), ("Y","V", 5), ("V", "Z", 3)]])
+
+    assert find_all_paths("X", "X", triangles) == deque([[('X', 'V', 4), ('V', 'Z', 3), ('Z', 'X', 11)],
+                                                         [('X', 'Z', 9), ('Z', 'X', 11)],
+                                                         [('X', 'Y', 2), ('Y', 'V', 5), ('V', 'Z', 3), ('Z', 'X', 11)]])
+
     # graph in the original problem
     graph = [("A", "B", 5),
              ("A", "E", 7),
@@ -79,3 +97,14 @@ if __name__ == "__main__":
     paths = find_all_paths("A", "A", my_graph)
     for path in paths:
         print("Path: {}".format(path))
+
+    def paths_with_predicate(paths, predicate):
+        return list(filter(lambda path: predicate(path), paths))
+
+    def compute_path_cost(path):
+        cost = 0
+        for arc in path:
+            cost = cost + path[2]
+        return cost
+
+    print(compute_path_cost([("A", "B", 2), ("B", "C", 8)]))
