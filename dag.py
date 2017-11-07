@@ -3,7 +3,14 @@ from copy import deepcopy
 
 
 def find_all_paths(from_node, to_node, in_graph):
-    all_paths = deque()
+    """
+    Find all the paths from from_node to to_node in in_graph
+    :param from_node:
+    :param to_node:
+    :param in_graph: list of tuples of the form (V1, V2, Weight)
+    :return: list of paths
+    """
+    all_paths = deque()  # how many hours did I waste because I missed you?!
 
     def take(step, paths_queue):
         src, dst, weight, history, visited = step
@@ -34,7 +41,6 @@ def find_all_paths(from_node, to_node, in_graph):
 
 
 if __name__ == "__main__":
-
     triangles = [
         ("X", "Y", 2),
         ("X", "Z", 9),
@@ -42,7 +48,11 @@ if __name__ == "__main__":
         ("Y", "V", 5),
         ("V", "Z", 3)
     ]
-
+    # let's call this a test suite..
+    assert find_all_paths("X", "Z", triangles) == deque([[("X", "V", 4), ("V", "Z", 3)],
+                                                  [("X", "Z", 9)],
+                                                  [("X", "Y", 2), ("Y","V", 5), ("V", "Z", 3)]])
+    # graph in the original problem
     graph = [("A", "B", 5),
              ("A", "E", 7),
              ("A", "D", 5),
@@ -53,6 +63,19 @@ if __name__ == "__main__":
              ("E", "B", 3),
              ("D", "C", 8)]
 
-    paths = find_all_paths("A", "C", graph)
+    my_graph = [
+        ("A", "B", 5),
+        ("A", "E", 7),
+        ("A", "D", 5),
+        ("B", "C", 4),
+        ("C", "D", 8),
+        ("C", "E", 2),
+        ("D", "E", 6),
+        ("E", "B", 3),
+        ("D", "C", 8),
+        ("C", "A", 15)  # new edge from C back to A
+    ]
+
+    paths = find_all_paths("A", "A", my_graph)
     for path in paths:
         print("Path: {}".format(path))
